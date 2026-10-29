@@ -64,14 +64,14 @@ services:
 ```
 
 并通过环境变量切到仓库自带的 `docker` profile（`application-docker.yml`），
-其连接串正好支持用服务名当主机名：
+注意这个 job 直接跑在 runner 机器上，service 容器只能通过映射端口用 `127.0.0.1` 访问；
 
 | 环境变量 | 值 |
 | --- | --- |
 | `SPRING_PROFILES_ACTIVE` | `docker` |
-| `MYSQL_HOST` / `MYSQL_PORT` | `mysql` / `3306` |
+| `MYSQL_HOST` / `MYSQL_PORT` | `127.0.0.1` / `3306` |
 | `MYSQL_DB` / `MYSQL_USER` / `MYSQL_PWD` | `snowy` / `root` / `12345678` |
-| `REDIS_HOST` / `REDIS_PORT` | `redis` / `6379` |
+| `REDIS_HOST` / `REDIS_PORT` | `127.0.0.1` / `6379` |
 
 建表脚本 `snowy-web-app/src/main/resources/_sql/snowy_mysql.sql` 在跑测试前导入。
 

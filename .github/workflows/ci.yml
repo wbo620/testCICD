@@ -82,12 +82,14 @@ jobs:
       - name: 编译并运行测试
         env:
           SPRING_PROFILES_ACTIVE: docker
-          MYSQL_HOST: mysql
+          # 这个 job 直接跑在 runner 机器上, service 容器通过映射端口用 localhost 访问。
+          # 只有当 job 跑在容器里时, 才需要用 service 的 label 当主机名。
+          MYSQL_HOST: 127.0.0.1
           MYSQL_PORT: '3306'
           MYSQL_DB: ${{ env.MYSQL_DATABASE }}
           MYSQL_USER: root
           MYSQL_PWD: ${{ env.MYSQL_ROOT_PASSWORD }}
-          REDIS_HOST: redis
+          REDIS_HOST: 127.0.0.1
           REDIS_PORT: '6379'
           REDIS_PWD: ''
           REDIS_DB: '1'
