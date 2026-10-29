@@ -1,12 +1,23 @@
 grib:
-  # GRIB2 文件路径（相对运行目录，或写绝对路径）
-  file: gfs_20260701_00z_f000.grib2
+  # GRIB2 文件路径（相对运行目录，或写绝对路径）。
+  # 容器部署时通过 GRIB_FILE 环境变量指向镜像内 /app/data 下的数据文件。
+  file: ${GRIB_FILE:gfs_20260701_00z_f000.grib2}
   # 默认查询变量
   default-variable: Visibility_surface
   preload: true
 
 server:
   port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        # 只暴露健康检查，避免把其它 actuator 端点暴露到公网
+        include: health
+  endpoint:
+    health:
+      show-details: never
 
 logging:
   level:

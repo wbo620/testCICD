@@ -4,12 +4,14 @@
 # ---------------------------------------------------------------------------
 
 # ---- 构建阶段 ----------------------------------------------------------
-FROM maven:3.9.9-eclipse-temurin-17 AS build
+FROM maven:3.9-eclipse-temurin-17 AS build
 WORKDIR /build
 
-# 先只复制 pom 与仓库配置，让依赖层可以被 Docker 缓存复用
+# 先只复制 pom 与仓库配置，让依赖层可以被 Docker 缓存复用。
+# go-offline 偶尔会因为个别插件的元数据解析失败而中断，这里不让它阻断镜像构建，
+# 真正需要的构件会在下面的 package 阶段补齐。
 COPY pom.xml maven-settings.xml ./
-RUN mvn -B -s maven-settings.xml dependency:go-offline
+RUN mvn -B -s maven-settings.xml dependency:go-offline || true
 
 # 再复制源码与数据文件
 COPY src ./src
