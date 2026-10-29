@@ -58,7 +58,7 @@
         <rustfs-s3.version>2.20.0</rustfs-s3.version>
         <sa-token.version>1.44.0</sa-token.version>
         <sm-crypto.version>0.3.2</sm-crypto.version>
-        <sms4j.version>3.3.4</sms4j.version>
+        <sms4j.version>3.3.5</sms4j.version>
         <snowy.version>3.0.0</snowy.version>
         <spring-boot.version>3.5.16</spring-boot.version>
         <spring-framework.version>6.2.19</spring-framework.version>
