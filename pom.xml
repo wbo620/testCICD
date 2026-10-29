@@ -48,7 +48,7 @@
         <mysql.version>8.3.0</mysql.version>
         <nashorn.version>15.6</nashorn.version>
         <nimbus-jose-jwt.version>9.40</nimbus-jose-jwt.version>
-        <opensaml.version>4.3.0</opensaml.version>
+        <opensaml.version>4.3.2</opensaml.version>
         <oshi.version>6.6.5</oshi.version>
         <pinyin4j.version>2.5.1</pinyin4j.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
