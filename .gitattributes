@@ -1,0 +1,8 @@
+# 只约束本次新增的文件, 不影响上游已有源码的换行符, 避免产生无意义的改动。
+#
+# 部署脚本必须是 LF, 否则拷到 Linux 服务器上会因为 CRLF 无法执行。
+deploy/scripts/*.sh text eol=lf
+
+# GitHub Actions 工作流统一 LF
+.github/workflows/*.yml text eol=lf
+.github/dependabot.yml text eol=lf

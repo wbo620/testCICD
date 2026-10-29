@@ -1,0 +1,120 @@
+# ---------------------------------------------------------------------------
+# 生产环境编排：MySQL + Redis + Snowy 后端 + Nginx 前端
+#
+# 由 CD 工作流通过 deploy/scripts/deploy.sh 拉起，
+# 镜像来自 GitHub Container Registry。
+# ---------------------------------------------------------------------------
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: snowy-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-12345678}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-snowy}
+      TZ: ${TZ:-Asia/Shanghai}
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - mysql-data:/var/lib/mysql
+      # 首次初始化时导入表结构（由 CD 工作流上传到 ./initdb/）
+      - ./initdb/snowy_mysql.sql:/docker-entrypoint-initdb.d/01-snowy.sql:ro
+    networks:
+      - snowy-net
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', '127.0.0.1', '-uroot', '-p${MYSQL_ROOT_PASSWORD:-12345678}']
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 40s
+    logging:
+      driver: json-file
+      options: { max-size: '10m', max-file: '3' }
+
+  redis:
+    image: redis:7.0
+    container_name: snowy-redis
+    restart: unless-stopped
+    environment:
+      TZ: ${TZ:-Asia/Shanghai}
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-data:/data
+    networks:
+      - snowy-net
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    logging:
+      driver: json-file
+      options: { max-size: '10m', max-file: '3' }
+
+  backend:
+    image: ${REGISTRY:-ghcr.io}/${IMAGE_NAMESPACE:-local}/snowy-backend:${IMAGE_TAG:-latest}
+    container_name: snowy-backend
+    restart: unless-stopped
+    environment:
+      TZ: ${TZ:-Asia/Shanghai}
+      SPRING_PROFILES_ACTIVE: docker
+      MYSQL_HOST: mysql
+      MYSQL_PORT: '3306'
+      MYSQL_DB: ${MYSQL_DATABASE:-snowy}
+      MYSQL_USER: root
+      MYSQL_PWD: ${MYSQL_ROOT_PASSWORD:-12345678}
+      REDIS_HOST: redis
+      REDIS_PORT: '6379'
+      REDIS_PWD: ''
+      REDIS_DB: '1'
+      # 对外访问地址，用于后端生成的前后端跳转链接
+      SNOWY_CONFIG_COMMON_FRONT_URL: ${PUBLIC_FRONT_URL:-http://localhost:81}
+      SNOWY_CONFIG_COMMON_BACKEND_URL: ${PUBLIC_BACKEND_URL:-http://localhost:81/api}
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    expose:
+      - '82'
+    networks:
+      - snowy-net
+    healthcheck:
+      test: ['CMD', 'curl', '-s', '-o', '/dev/null', 'http://localhost:82/']
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 90s
+    logging:
+      driver: json-file
+      options: { max-size: '20m', max-file: '5' }
+
+  frontend:
+    image: ${REGISTRY:-ghcr.io}/${IMAGE_NAMESPACE:-local}/snowy-frontend:${IMAGE_TAG:-latest}
+    container_name: snowy-frontend
+    restart: unless-stopped
+    environment:
+      TZ: ${TZ:-Asia/Shanghai}
+    ports:
+      - '${HTTP_PORT:-81}:80'
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - snowy-net
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://localhost/healthz']
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: json-file
+      options: { max-size: '20m', max-file: '5' }
+
+networks:
+  snowy-net:
+    driver: bridge
+
+volumes:
+  mysql-data:
+  redis-data:

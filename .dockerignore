@@ -1,0 +1,17 @@
+# 后端镜像只需要 Java 工程本身
+.git
+.github
+.claude
+.gitee
+images
+docs
+deploy
+snowy-admin-web
+**/target
+**/node_modules
+**/dist
+**/.vite
+*.md
+.idea
+*.iml
+*.log
