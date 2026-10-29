@@ -41,7 +41,7 @@
         <lark-sdk.version>2.3.7</lark-sdk.version>
         <lombok.version>1.18.48</lombok.version>
         <mail.version>1.5.4</mail.version>
-        <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
+        <maven-compiler-plugin.version>3.16.0</maven-compiler-plugin.version>
         <maven-source-plugin.version>3.3.1</maven-source-plugin.version>
         <minio.version>8.5.12</minio.version>
         <mybatis-plus.version>3.5.9</mybatis-plus.version>
