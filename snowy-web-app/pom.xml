@@ -24,6 +24,13 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- test: MainTest 是 JUnit4 写法, Spring Boot 3 默认不带 vintage 引擎, 需要显式引入 -->
+        <dependency>
+            <groupId>org.junit.vintage</groupId>
+            <artifactId>junit-vintage-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <!-- test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
