@@ -115,7 +115,7 @@
 | --- | --- | --- |
 | `DEPLOY_PORT` | `22` | SSH 端口 |
 | `DEPLOY_PATH` | `/opt/grib-service` | 服务器部署目录 |
-| `DEPLOY_HEALTH_URL` | `http://<host>/healthz` | 部署后的健康检查地址 |
+| `DEPLOY_HEALTH_URL` | `http://<host>/healthz` | 部署后的健康检查地址（**仓库变量 Variables**，不是 Secret） |
 | `GHCR_PAT` | 空 | 私有镜像仓库的 PAT（权限 `read:packages`） |
 | `GHCR_USER` | 空 | 与 `GHCR_PAT` 配套的用户名 |
 
@@ -125,7 +125,8 @@
 
 | 名称 | 说明 |
 | --- | --- |
-| `vars.IMAGE_NAMESPACE` | 若不想用 GitHub 组织名作为镜像命名空间，可改用该变量 |
+| `DEPLOY_HEALTH_URL` | 部署后的健康检查地址。**必须用变量而不是 Secret**：`jobs.<id>.environment.url` 的可用上下文里没有 `secrets`，写成 Secret 会让整个工作流文件被判定为无效 |
+| `IMAGE_NAMESPACE` | 若不想用 GitHub 组织名作为镜像命名空间，可改用该变量 |
 
 ---
 
