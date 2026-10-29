@@ -33,8 +33,18 @@ RUN groupadd --system app && useradd --system --gid app --create-home app
 WORKDIR /app
 COPY --from=build /build/app.jar /app/app.jar
 
+# Snowy 的 logback-spring.xml 把日志写到 ${log.path:app-log}, 默认是工作目录下的
+# 相对路径 app-log/。容器以非 root 用户运行, 而 /app 归 root 所有, Logback
+# 建不出这个目录就会直接让应用启动失败:
+#     Logback configuration error detected:
+#     openFile(app-log/log_error.log,true) call failed. No such file or directory
+# 这里提前建好并把属主交给 app 用户, 同时用 LOG_PATH 环境变量固定成绝对路径
+# (Spring 的宽松绑定: LOG_PATH -> log.path), 方便部署时挂卷。
+RUN mkdir -p /app/app-log && chown -R app:app /app
+
 ENV TZ=Asia/Shanghai \
     SPRING_PROFILES_ACTIVE=docker \
+    LOG_PATH=/app/app-log \
     JAVA_OPTS="-XX:MaxRAMPercentage=75 -XX:+UseSerialGC -Djava.security.egd=file:/dev/./urandom"
 
 EXPOSE 82

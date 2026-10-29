@@ -77,6 +77,9 @@ services:
         condition: service_healthy
     expose:
       - '82'
+    volumes:
+      # Snowy 的日志写到 ${log.path}, 这里落到数据卷, 容器重建后日志不丢
+      - backend-logs:/app/app-log
     networks:
       - snowy-net
     healthcheck:
@@ -118,3 +121,4 @@ networks:
 volumes:
   mysql-data:
   redis-data:
+  backend-logs:
