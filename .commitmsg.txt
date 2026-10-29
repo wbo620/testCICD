@@ -1,6 +1,0 @@
-fix: services 块里改用常量, 修复工作流文件被判定为无效
-
-jobs.<job_id>.services.<service_id>.env / options 的可用上下文只有
-github / needs / strategy / matrix / vars / inputs, 不包含 env。
-在那里写 ${{ env.MYSQL_ROOT_PASSWORD }} 会让 GitHub 判定整个工作流文件无效
-(工作流名回退成文件路径, 且不创建任何 job), 这里直接改成常量。
