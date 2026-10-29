@@ -68,6 +68,13 @@ jobs:
         run: |
           set -euo pipefail
           SQL_FILE="snowy-web-app/src/main/resources/_sql/snowy_mysql.sql"
+          # 等 MySQL 真正就绪 (用 TCP 判断, 见 smoke job 里的说明)
+          for i in $(seq 1 60); do
+            if mysqladmin --host=127.0.0.1 --port=3306 --user=root --password="$MYSQL_ROOT_PASSWORD" ping >/dev/null 2>&1; then
+              break
+            fi
+            sleep 3
+          done
           # 建表脚本里没有 USE 语句, 必须显式指定默认库, 否则报 1046 No database selected
           if command -v mysql >/dev/null 2>&1; then
             mysql --host=127.0.0.1 --port=3306 --user=root \
@@ -77,7 +84,6 @@ jobs:
             docker run --rm --network host -i mysql:8.0 \
               mysql -h127.0.0.1 -P3306 -uroot -p"$MYSQL_ROOT_PASSWORD" "$MYSQL_DATABASE" < "$SQL_FILE"
           fi
-          echo "数据库结构初始化完成"
 
       - name: 编译并运行测试
         env:
@@ -232,8 +238,11 @@ jobs:
           docker run -d --name ci-redis --network snowy-ci-net redis:7.0
 
           echo "::group::等待 MySQL 就绪"
-          for i in $(seq 1 40); do
-            if docker exec ci-mysql mysqladmin ping -uroot -p12345678 >/dev/null 2>&1; then
+          # 必须用 TCP(-h127.0.0.1) 判断就绪: MySQL 官方镜像的 entrypoint 在初始化阶段
+          # 会先起一个临时 server 再重启, 临时阶段的 socket 路径和正式启动后不一样,
+          # 用 socket 连会在重启瞬间连不上。
+          for i in $(seq 1 60); do
+            if docker exec ci-mysql mysql -h127.0.0.1 -uroot -p12345678 -e "SELECT 1" >/dev/null 2>&1; then
               echo "MySQL 就绪"; break
             fi
             sleep 3
@@ -242,7 +251,7 @@ jobs:
 
           echo "::group::导入表结构"
           { echo "USE snowy;"; cat snowy-web-app/src/main/resources/_sql/snowy_mysql.sql; } \
-            | docker exec -i ci-mysql mysql -uroot -p12345678
+            | docker exec -i ci-mysql mysql -h127.0.0.1 -uroot -p12345678
           echo "::endgroup::"
 
           docker run -d --name ci-backend --network snowy-ci-net -p 8082:82 \
