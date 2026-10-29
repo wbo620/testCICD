@@ -18,7 +18,7 @@ services:
     volumes:
       - mysql-data:/var/lib/mysql
       # 首次初始化时导入表结构（由 CD 工作流上传到 ./initdb/）
-      - ./initdb/snowy_mysql.sql:/docker-entrypoint-initdb.d/01-snowy.sql:ro
+      - ./initdb/01-snowy.sql:/docker-entrypoint-initdb.d/01-snowy.sql:ro
     networks:
       - snowy-net
     healthcheck:

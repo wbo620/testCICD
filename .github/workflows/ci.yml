@@ -68,13 +68,14 @@ jobs:
         run: |
           set -euo pipefail
           SQL_FILE="snowy-web-app/src/main/resources/_sql/snowy_mysql.sql"
+          # 建表脚本里没有 USE 语句, 必须显式指定默认库, 否则报 1046 No database selected
           if command -v mysql >/dev/null 2>&1; then
             mysql --host=127.0.0.1 --port=3306 --user=root \
-              --password="$MYSQL_ROOT_PASSWORD" < "$SQL_FILE"
+              --password="$MYSQL_ROOT_PASSWORD" --database="$MYSQL_DATABASE" < "$SQL_FILE"
           else
             # runner 上没有 mysql 客户端时, 用容器里的客户端连宿主映射端口
             docker run --rm --network host -i mysql:8.0 \
-              mysql -h127.0.0.1 -P3306 -uroot -p"$MYSQL_ROOT_PASSWORD" < "$SQL_FILE"
+              mysql -h127.0.0.1 -P3306 -uroot -p"$MYSQL_ROOT_PASSWORD" "$MYSQL_DATABASE" < "$SQL_FILE"
           fi
           echo "数据库结构初始化完成"
 

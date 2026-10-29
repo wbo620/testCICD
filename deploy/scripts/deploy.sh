@@ -47,6 +47,24 @@ echo "==> 上一版本: ${PREVIOUS_TAG:-<无>}"
 export REGISTRY IMAGE_NAMESPACE IMAGE_TAG IMAGE_NAME
 export COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME:-snowy}"
 
+# 生成 MySQL 初始化脚本。
+# Snowy 的建表脚本里没有 USE 语句, 而 MySQL 官方镜像的 entrypoint 执行
+# /docker-entrypoint-initdb.d 下的 .sql 时不会默认选中数据库,
+# 直接导入会报 1046 (3D000) No database selected, 所以这里补一行 USE。
+DB_NAME="${MYSQL_DATABASE:-snowy}"
+if [ -f "$DEPLOY_PATH/.env" ]; then
+  DB_NAME="$(sed -n 's/^MYSQL_DATABASE=//p' "$DEPLOY_PATH/.env" | head -1 | tr -d '"' | tr -d "'")"
+  DB_NAME="${DB_NAME:-snowy}"
+fi
+if [ -f "$DEPLOY_PATH/initdb-src/snowy_mysql.sql" ]; then
+  mkdir -p "$DEPLOY_PATH/initdb"
+  {
+    echo "USE \`$DB_NAME\`;"
+    cat "$DEPLOY_PATH/initdb-src/snowy_mysql.sql"
+  } > "$DEPLOY_PATH/initdb/01-snowy.sql"
+  echo "==> 已生成数据库初始化脚本 (库名: $DB_NAME)"
+fi
+
 compose() {
   docker compose -f "$COMPOSE_FILE" "$@"
 }

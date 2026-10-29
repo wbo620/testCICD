@@ -146,11 +146,11 @@ jobs:
         run: |
           set -euo pipefail
           ssh -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" \
-            "mkdir -p '$DEPLOY_PATH/initdb'"
+            "mkdir -p '$DEPLOY_PATH/initdb-src'"
           scp -P "$DEPLOY_PORT" -r deploy/. "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/"
-          # MySQL 首次初始化用的建表脚本
+          # MySQL 首次初始化用的建表脚本; deploy.sh 会补上 USE 语句后生成 initdb/01-snowy.sql
           scp -P "$DEPLOY_PORT" snowy-web-app/src/main/resources/_sql/snowy_mysql.sql \
-            "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/initdb/snowy_mysql.sql"
+            "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/initdb-src/snowy_mysql.sql"
 
       - name: 执行部署
         env:
