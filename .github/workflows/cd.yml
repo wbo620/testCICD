@@ -39,7 +39,7 @@ env:
   IMAGE_NAME: grib-service
 
 jobs:
-  build-push:
+  build_push:
     name: 构建并推送镜像 (${{ matrix.service }})
     runs-on: ubuntu-latest
     permissions:
@@ -100,7 +100,7 @@ jobs:
 
   deploy:
     name: 部署到服务器
-    needs: [build-push]
+    needs: [build_push]
     runs-on: ubuntu-latest
     environment:
       name: production
@@ -146,7 +146,7 @@ jobs:
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH || '/opt/grib-service' }}
           DEPLOY_HEALTH_URL: ${{ secrets.DEPLOY_HEALTH_URL }}
           REGISTRY: ${{ env.REGISTRY }}
-          IMAGE_NAMESPACE: ${{ needs.build-push.outputs.namespace }}
+          IMAGE_NAMESPACE: ${{ needs.build_push.outputs.namespace }}
           IMAGE_NAME: ${{ env.IMAGE_NAME }}
           IMAGE_TAG: ${{ github.event.inputs.image_tag || format('sha-{0}', github.sha) }}
           GHCR_PAT: ${{ secrets.GHCR_PAT }}

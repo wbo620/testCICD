@@ -141,16 +141,36 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: [java, javascript-typescript]
+        include:
+          # Java 需要编译出字节码才能分析，因此显式跑一次构建
+          - language: java
+            build-mode: manual
+          # 前端是解释型语言，不需要构建步骤
+          - language: javascript-typescript
+            build-mode: none
     steps:
       - name: 检出代码
         uses: actions/checkout@v4
+
+      - name: 安装 JDK ${{ env.JAVA_VERSION }}
+        if: matrix.language == 'java'
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: maven
+          cache-dependency-path: pom.xml
 
       - name: 初始化 CodeQL
         uses: github/codeql-action/init@v3
         with:
           languages: ${{ matrix.language }}
+          build-mode: ${{ matrix.build-mode }}
           queries: security-and-quality
+
+      - name: 编译（供 CodeQL 提取字节码）
+        if: matrix.language == 'java'
+        run: mvn -B -s maven-settings.xml -DskipTests package
 
       - name: 执行分析
         uses: github/codeql-action/analyze@v3
