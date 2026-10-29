@@ -1,0 +1,23 @@
+# 构建产物
+target/
+.m2repo/
+.mvn/
+!.mvn/wrapper/maven-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Git
+.git/
+.github/
+.gitignore
+
+# 数据与文档（后端镜像需要 GRIB2 文件，因此不忽略）
+*.md
+docs/
+
+# 其它
+*.log
+.DS_Store

@@ -1,0 +1,13 @@
+# ---------------------------------------------------------------------------
+# 可选的 compose 覆盖示例：使用服务器上的外部 GRIB2 文件
+#
+# 用法：cp docker-compose.override.yml.example docker-compose.override.yml
+#       docker compose 会自动合并该文件
+# ---------------------------------------------------------------------------
+services:
+  backend:
+    environment:
+      GRIB_FILE: /data/gfs_20260701_00z_f000.grib2
+    volumes:
+      # 挂载单个文件，避免空目录把镜像内的数据文件遮住
+      - /srv/grib/gfs_20260701_00z_f000.grib2:/data/gfs_20260701_00z_f000.grib2:ro

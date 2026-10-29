@@ -1,0 +1,13 @@
+grib:
+  # GRIB2 文件路径（相对运行目录，或写绝对路径）
+  file: gfs_20260701_00z_f000.grib2
+  # 默认查询变量
+  default-variable: Visibility_surface
+  preload: true
+
+server:
+  port: 8080
+
+logging:
+  level:
+    org.example.grib: INFO

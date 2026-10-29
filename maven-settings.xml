@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xmlns="http://maven.apache.org/SETTINGS/1.2.0">
+  <mirrors>
+    <mirror>
+      <id>central-direct</id>
+      <mirrorOf>central</mirrorOf>
+      <url>https://repo1.maven.org/maven2</url>
+    </mirror>
+  </mirrors>
+  <profiles>
+    <profile>
+      <id>unidata</id>
+      <repositories>
+        <repository>
+          <id>unidata-releases</id>
+          <url>https://artifacts.unidata.ucar.edu/repository/unidata-releases/</url>
+          <releases><enabled>true</enabled></releases>
+          <snapshots><enabled>false</enabled></snapshots>
+        </repository>
+      </repositories>
+    </profile>
+  </profiles>
+  <activeProfiles><activeProfile>unidata</activeProfile></activeProfiles>
+</settings>

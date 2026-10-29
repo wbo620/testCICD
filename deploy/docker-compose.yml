@@ -1,0 +1,62 @@
+# ---------------------------------------------------------------------------
+# 生产环境编排：Spring Boot 后端 + Nginx 前端
+#
+# 由 CD 工作流通过 deploy/scripts/deploy.sh 拉起，镜像来自 GitHub Container Registry。
+# ---------------------------------------------------------------------------
+
+services:
+  backend:
+    image: ${REGISTRY:-ghcr.io}/${IMAGE_NAMESPACE:-local}/grib-service-backend:${IMAGE_TAG:-latest}
+    container_name: grib-backend
+    restart: unless-stopped
+    environment:
+      TZ: ${TZ:-Asia/Shanghai}
+      GRIB_FILE: ${GRIB_FILE:-/app/data/gfs_20260701_00z_f000.grib2}
+      JAVA_OPTS: ${JAVA_OPTS:--XX:MaxRAMPercentage=75 -XX:+UseSerialGC}
+    # 注意：默认不挂载数据卷，镜像内已内置 GRIB2 文件。
+    # 若要换成服务器上的其它 GRIB2 文件，请参考 docker-compose.override.yml.example
+    # 覆盖 GRIB_FILE 环境变量（挂载单个文件，不要挂空目录，否则会遮住镜像内的数据文件）。
+    expose:
+      - '8080'
+    networks:
+      - grib-net
+    healthcheck:
+      test: ['CMD', 'curl', '-fsS', 'http://localhost:8080/actuator/health']
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '3'
+
+  frontend:
+    image: ${REGISTRY:-ghcr.io}/${IMAGE_NAMESPACE:-local}/grib-service-frontend:${IMAGE_TAG:-latest}
+    container_name: grib-frontend
+    restart: unless-stopped
+    environment:
+      TZ: ${TZ:-Asia/Shanghai}
+    ports:
+      - '${HTTP_PORT:-80}:80'
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - grib-net
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://localhost/healthz']
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '3'
+
+networks:
+  grib-net:
+    driver: bridge

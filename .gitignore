@@ -1,0 +1,24 @@
+# 构建产物与依赖
+target/
+frontend/node_modules/
+frontend/dist/
+frontend/coverage/
+frontend/.vite/
+*.tsbuildinfo
+
+# 本地工具目录
+.local/
+.m2repo/
+.idea/
+*.iml
+.vscode/
+
+# 运行时与系统文件
+.DS_Store
+Thumbs.db
+*.log
+*.pid
+
+# netCDF-Java 生成的索引文件
+*.gbx9
+*.ncx3
