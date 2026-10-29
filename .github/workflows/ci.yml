@@ -31,16 +31,19 @@ jobs:
   backend:
     name: 后端构建与测试
     runs-on: ubuntu-latest
+    # 注意：services.*.env / services.*.options 里不支持 ${{ env.* }} 上下文
+    # (可用上下文只有 github/needs/strategy/matrix/vars/inputs)，
+    # 写成表达式会让整个工作流文件被判定为无效，所以这里直接写常量。
     services:
       mysql:
         image: mysql:8.0
         env:
-          MYSQL_ROOT_PASSWORD: ${{ env.MYSQL_ROOT_PASSWORD }}
-          MYSQL_DATABASE: ${{ env.MYSQL_DATABASE }}
+          MYSQL_ROOT_PASSWORD: '12345678'
+          MYSQL_DATABASE: 'snowy'
         ports:
           - '3306:3306'
         options: >-
-          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -p${{ env.MYSQL_ROOT_PASSWORD }}"
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -p12345678"
           --health-interval=10s --health-timeout=5s --health-retries=15
       redis:
         image: redis:7.0
