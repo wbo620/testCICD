@@ -61,7 +61,7 @@ jobs:
             dockerfile: Dockerfile
     steps:
       - name: 检出代码
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: 生成镜像命名空间
         id: ns
@@ -123,7 +123,7 @@ jobs:
       url: ${{ vars.DEPLOY_HEALTH_URL }}
     steps:
       - name: 检出代码
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: 配置 SSH
         env:
