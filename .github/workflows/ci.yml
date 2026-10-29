@@ -162,7 +162,7 @@ jobs:
           cache-dependency-path: pom.xml
 
       - name: 初始化 CodeQL
-        uses: github/codeql-action/init@v3
+        uses: github/codeql-action/init@v4
         with:
           languages: ${{ matrix.language }}
           build-mode: ${{ matrix.build-mode }}
@@ -173,6 +173,6 @@ jobs:
         run: mvn -B -s maven-settings.xml -DskipTests package
 
       - name: 执行分析
-        uses: github/codeql-action/analyze@v3
+        uses: github/codeql-action/analyze@v4
         with:
           category: /language:${{ matrix.language }}
