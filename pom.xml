@@ -56,7 +56,7 @@
         <qcloud-cos.version>5.6.199</qcloud-cos.version>
         <redisson.version>3.46.0</redisson.version>
         <rustfs-s3.version>2.20.0</rustfs-s3.version>
-        <sa-token.version>1.44.0</sa-token.version>
+        <sa-token.version>1.46.0</sa-token.version>
         <sm-crypto.version>0.3.2</sm-crypto.version>
         <sms4j.version>3.3.4</sms4j.version>
         <snowy.version>3.0.0</snowy.version>
