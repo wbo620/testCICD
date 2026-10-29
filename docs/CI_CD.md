@@ -127,6 +127,7 @@
 | --- | --- |
 | `DEPLOY_HEALTH_URL` | 部署后的健康检查地址。**必须用变量而不是 Secret**：`jobs.<id>.environment.url` 的可用上下文里没有 `secrets`，写成 Secret 会让整个工作流文件被判定为无效 |
 | `IMAGE_NAMESPACE` | 若不想用 GitHub 组织名作为镜像命名空间，可改用该变量 |
+| `DEPLOY_ENABLED` | 设为 `true` 才会执行部署。默认不部署，只构建并推送镜像，这样还没配服务器时主干推送也能保持绿灯 |
 
 ---
 

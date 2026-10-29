@@ -1,41 +1,50 @@
 version: 2
 updates:
+  # 后端依赖：屏蔽 netCDF-Java —— edu.ucar:* 只发布在 Unidata 仓库,
+  # 不在 Maven Central 上, 且 4.6.x -> 8.x 会直接破坏 ucar.nc2 API 用法。
   - package-ecosystem: maven
     directory: /
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    ignore:
+      - dependency-name: 'edu.ucar:*'
     labels: [dependencies, backend]
-    reviewers: [Kylin]
 
+  # 前端依赖：按组聚合，避免一次开十几个 PR
   - package-ecosystem: npm
     directory: /frontend
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    groups:
+      frontend-deps:
+        patterns: ['*']
     labels: [dependencies, frontend]
-    reviewers: [Kylin]
 
+  # GitHub Actions 本身：一起升级
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    groups:
+      actions:
+        patterns: ['*']
     labels: [dependencies, ci]
-    reviewers: [Kylin]
 
+  # 后端基础镜像
   - package-ecosystem: docker
     directory: /
     schedule:
-      interval: weekly
-    open-pull-requests-limit: 5
+      interval: monthly
+    open-pull-requests-limit: 3
     labels: [dependencies, docker]
-    reviewers: [Kylin]
 
+  # 前端基础镜像
   - package-ecosystem: docker
     directory: /frontend
     schedule:
-      interval: weekly
-    open-pull-requests-limit: 5
+      interval: monthly
+    open-pull-requests-limit: 3
     labels: [dependencies, docker]
-    reviewers: [Kylin]

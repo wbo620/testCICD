@@ -100,9 +100,23 @@ jobs:
           cache-from: type=gha,scope=${{ matrix.service }}
           cache-to: type=gha,mode=max,scope=${{ matrix.service }}
 
+  deploy_skip:
+    name: 未启用部署
+    needs: [build_push]
+    if: ${{ vars.DEPLOY_ENABLED != 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: 说明
+        run: |
+          echo "::warning::仓库变量 DEPLOY_ENABLED 未设为 true, 本次只构建并推送镜像, 不执行部署。"
+          echo "::notice::镜像已推送到 ghcr.io/${{ needs.build_push.outputs.namespace }}/grib-service-backend 与 grib-service-frontend"
+          echo "::notice::配置 DEPLOY_* 系列 Secrets 并把 DEPLOY_ENABLED 设为 true 后, 推送 main 即可自动部署。"
   deploy:
     name: 部署到服务器
     needs: [build_push]
+    # 只有显式打开仓库变量 DEPLOY_ENABLED=true 才会真的部署,
+    # 这样在还没配服务器时主干推送也不会把流水线跑红。
+    if: ${{ vars.DEPLOY_ENABLED == 'true' }}
     runs-on: ubuntu-latest
     environment:
       name: production
