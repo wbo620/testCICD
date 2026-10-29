@@ -21,7 +21,7 @@ RUN mvn -B -s maven-settings.xml -DskipTests package \
     && cp target/testProject.jar /build/app.jar
 
 # ---- 运行阶段 ----------------------------------------------------------
-FROM eclipse-temurin:17-jre-jammy AS runtime
+FROM eclipse-temurin:22-jre-jammy AS runtime
 
 # curl 供 HEALTHCHECK 使用；tzdata 让容器内时区可配置
 RUN apt-get update \
